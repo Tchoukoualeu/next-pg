@@ -15,8 +15,6 @@ export default function Home() {
   const [end, setEnd] = useState("")
   const [isFetching, setIsFetching] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
-  const [refDate, setRefDate] = useState("")
-  const [warning, setWarning] = useState("")
 
   useEffect(() => {
     try {
@@ -24,13 +22,12 @@ export default function Home() {
 
       axios<{ refStart: string }>({
         method: "get",
-        url: "http://localhost:5001/dates/last",
+        url: "http://localhost:5001/dates/today",
       }).then((response) => {
         setIsFetching(false)
 
         const endDate = response.data.refStart || new Date()
         const normalizedDate = moment(endDate).format("yyyy-MM-DD")
-        setRefDate(normalizedDate)
         setStart(normalizedDate)
       })
     } catch (err) {
@@ -40,15 +37,8 @@ export default function Home() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    setWarning("")
 
     if (!start || !end) return
-
-    if (moment(start).isBefore(moment(refDate))) {
-      setWarning("Dates invalides")
-
-      return
-    }
 
     setIsSaving(true)
 
@@ -121,8 +111,6 @@ export default function Home() {
               Durée en jours: {moment(end).diff(moment(start), "day")}
             </div>
           )}
-
-          {warning && <div className="mt-2 bg-red-400">{warning}</div>}
 
           <div>
             <button
